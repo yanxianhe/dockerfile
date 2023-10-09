@@ -1,0 +1,14 @@
+version: '3'
+services:
+  certbot:
+    image: registry.cn-beijing.aliyuncs.com/dockermg/v2certbot
+    environment:
+      - TZ=Asia/Shanghai
+      - UPDATE_INTERVAL=86400 # 间隔多久更新一次证书默 24小时 86400s
+      - LET_MAILBOX=xianhe_yan@sina.com
+      - DOMAIN_NAME=yanxianhe.com
+    volumes:
+      - ./certs:/etc/letsencrypt
+      - ./www:/etc/letsencrypt/www # 根据自己需求配置
+    entrypoint: sh /letsencrypt.sh
+
