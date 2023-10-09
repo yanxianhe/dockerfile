@@ -12,7 +12,6 @@ CURRENT_HASH=$(sha256sum "$FILE" | awk '{print $1}')
 SAVED_HASH=$(cat "$PREVIOUS_HASH")
 if [ "$CURRENT_HASH" != "$SAVED_HASH" ]; then
     docker-compose -p nginx -f /opt/nginx-composer.yml restart nginx
-    echo "文件未发生变化。"
 fi
 
 # 更新保存的哈希值
