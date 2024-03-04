@@ -18,11 +18,13 @@
 
 
 
-# [v2lbsyun](../../v2lbsyun/)
+# [v2lbsyun](../../../v2lbsyun/)
 
 *注意事项*
 - *使用前请自行测试验证*
 - *注意代理地址设置*
+- [*使用前请先阅读README*](../../../v2lbsyun/README.md)
+
 ## lbsyun 私有化部署使用外网百度地图开放平
 
 
