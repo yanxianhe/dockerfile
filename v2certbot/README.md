@@ -170,3 +170,13 @@ docker exec -it nginx nginx -s reload # 重新加载配置
 
 * 二、利用文件sha256sum 结合 crontab 定时任务[](./restart-nginx1.sh)
 - 利用 crontab 24h 判断证书sha256sum值，发生变化时则触发重新加载[ nginx  sudo nginx -s reload 换成  docker exec -it nginx nginx -s reload]
+
+
+### 三、crontab 根据需要自行设置
+
+- 例：设置每日0点 检查校验 nginx 证书
+- chmod a+x /opt/restart-nginx.sh
+
+~~~~~~
+0 0 * * * sh /opt/restart-nginx.sh
+~~~~~~
