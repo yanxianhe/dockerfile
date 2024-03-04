@@ -13,7 +13,7 @@
 * 前提是网站 80 服务正常可以访问
 * 生成证书后再配置 https 配置
 
-### 一 、nginx 直接安装启动 [docker-compose yml 使用方式启动](./docker-compose-v2certbot.yml)
+### 一 、nginx 直接安装在宿主机（apt/yum/ 等方式） [docker-compose yml 使用方式启动](./docker-compose-v2certbot.yml)
 #### 1、v2certbot 服务说明
 
 ~~~~~~
