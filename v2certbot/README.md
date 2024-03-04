@@ -147,8 +147,8 @@ Found the following certs:
 ~~~~~~
 …… 略
     listen       443 ssl;
-    ssl_certificate ./certs/live/${DOMAIN_NAME}/fullchain.pem;
-    ssl_certificate_key ./certs/live/${DOMAIN_NAME}/privkey.pem;
+    ssl_certificate /etc/ssl/certs/server.crt;
+    ssl_certificate_key /etc/ssl/private/server.key;
 …… 略
 ~~~~~~
 
