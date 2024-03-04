@@ -1,30 +1,29 @@
-#!/bin/bash
+#!/bin/sh
 set -x
-if [ -z ${UPDATE_INTERVAL} ] ;then
-    UPDATE_INTERVAL=86400
-fi
-FLG_UPDATE=true
-while :
-do
-    while true; do
-        if [ -z ${LET_MAILBOX} ]||[ -z ${DOMAIN_NAME} ];then
-            echo "Please set the environment variable LET_ MAILBOX DOMAIN_ NAME LET_ MAILBOX Your email, DOMAIN_ NAME Your domain name"
-            sleep 5
-            break
+# 设置默认更新间隔为一天的秒数
+UPDATE_INTERVAL=${UPDATE_INTERVAL:-86400}
+while true; do
+    # 检查必要的环境变量是否设置
+    if [ -z "${LET_MAILBOX}" ] || [ -z "${DOMAIN_NAME}" ]; then
+        echo "Please set the environment variables LET_MAILBOX and DOMAIN_NAME."
+        sleep 5
+        continue
+    fi
+    # 检查是否存在管理的证书，如果没有则执行首次证书申请操作
+    if ! certbot certificates | grep -q "${DOMAIN_NAME}"; then
+        certbot certonly --webroot --webroot-path=/var/www/html --email "${LET_MAILBOX}" --agree-tos --no-eff-email --force-renewal -d "${DOMAIN_NAME}"
+        echo "Certbot certonly --webroot operation completed."
+    else
+        # 获取证书到期天数
+        EXPIRY_DATE=$(certbot certificates | grep "Expiry Date" | awk '{print $6}')
+        echo "Certificate for ${DOMAIN_NAME} will expire on: ${EXPIRY_DATE}"
+        # 判断证书有效期，大于10天不续订，否则续订
+        if [ $EXPIRY_DATE -le 10 ]; then
+            certbot renew --webroot --webroot-path=/var/www/html
+            echo "Certbot renew --webroot operation completed."
         else
-            if [ ${FLG_UPDATE} == true ];then
-                certbot certonly --webroot --webroot-path=/etc/letsencrypt/www --email ${LET_MAILBOX} --agree-tos --no-eff-email --force-renewal -d ${DOMAIN_NAME}
-                echo "certonly --webroot ok"
-                FLG_UPDATE=false
-		break
-            else
-                while :
-                do
-                    certbot renew --webroot --webroot-path=/etc/letsencrypt/www
-                    echo "certbot renew --webroot ok"
-                    sleep ${UPDATE_INTERVAL}
-                done
-            fi
+            echo "Certificate is still valid for more than 10 days. No renewal needed."
         fi
-    done
+    fi
+    sleep "${UPDATE_INTERVAL}"
 done

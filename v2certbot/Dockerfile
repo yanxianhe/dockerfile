@@ -1,5 +1,5 @@
-FROM certbot/certbot
+FROM certbot/certbot:v2.9.0
 LABEL maintainer "yxh <xianhe_yan@sina.com>"
-WORKDIR /etc/letsencrypt/www
+# 复制脚本到容器中
 ADD ./letsencrypt.sh /letsencrypt.sh
-RUN chmod a+x /letsencrypt.sh
+WORKDIR /var/www/html

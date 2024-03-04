@@ -1,14 +1,16 @@
-version: '3'
+version: '3.7'
 services:
   certbot:
-    image: registry.cn-beijing.aliyuncs.com/dockermg/v2certbot
+    hostname: v2certbot
+    container_name: v2certbot
+    restart: always
+    image: registry.cn-beijing.aliyuncs.com/dockermg/v2certbot:v1.0.0
     environment:
       - TZ=Asia/Shanghai
       - UPDATE_INTERVAL=86400 # 间隔多久更新一次证书默 24小时 86400s
       - LET_MAILBOX=xianhe_yan@sina.com
       - DOMAIN_NAME=yanxianhe.com
     volumes:
-      - ./certs:/etc/letsencrypt
-      - ./www:/etc/letsencrypt/www # 根据自己需求配置
+      - ./certs:/etc/letsencrypt # letsencrypt 配置证书位于./certs/live/${DOMAIN_NAME}/fullchain.pem ./certs/live/${DOMAIN_NAME}/privkey.pem
+      - ./www/html:/var/www/html # 根据自己需求配置到nginx 工作目录
     entrypoint: sh /letsencrypt.sh
-

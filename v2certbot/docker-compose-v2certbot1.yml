@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+  nginx:
+    image: nginx:latest
+    hostname: nginx
+    container_name: nginx
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /opt/nginx/conf.d:/etc/nginx/conf.d
+      - /opt/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /opt/html:/usr/share/nginx/html
+      - /opt/nginx/letsencrypt/live/yanxianhe.com/fullchain.pem:/etc/ssl/certs/server.crt
+      - /opt/nginx/letsencrypt/live/yanxianhe.com/privkey.pem:/etc/ssl/private/server.key
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - TZ=Asia/Shanghai
+      - DNS_ADDRS=8.8.8.8,8.8.4.4
+  certbot:
+    hostname: v2certbot
+    container_name: v2certbot
+    image: registry.cn-beijing.aliyuncs.com/dockermg/v2certbot:v1.0.0
+    environment:
+      - TZ=Asia/Shanghai
+      - UPDATE_INTERVAL=86400
+      - LET_MAILBOX=xianhe_yan@sina.com
+      - DOMAIN_NAME=yanxianhe.com
+    volumes:
+      - /opt/html:/var/www/html
+      - /opt/nginx/letsencrypt:/etc/letsencrypt
+    entrypoint: sh /letsencrypt.sh 
+    networks:
+      - nginx_net
+networks:
+  nginx_net:
+
