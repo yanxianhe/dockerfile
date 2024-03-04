@@ -2,7 +2,7 @@
 
 * https://github.com/certbot/certbot 
 * 基于原有镜像certbot/certbot:v2.9.0 
-* [由于 certbot 运行后容器就结束导致无法直接 续订证书]
+* [由于 certbot 运行后容器就结束导致无法直接 续订证书](./Dockerfile)
 
 
 
@@ -13,7 +13,7 @@
 * 前提是网站 80 服务正常可以访问
 * 生成证书后再配置 https 配置
 
-### 一 、nginx 直接安装在宿主机（apt/yum/ 等方式） [docker-compose yml 使用方式启动](./docker-compose-v2certbot.yml)
+### 一 、nginx 直接安装在宿主机（apt/yum/ 等方式） [docker-compose yml ](./docker-compose-v2certbot.yml)
 #### 1、v2certbot 服务说明
 
 ~~~~~~
@@ -87,7 +87,7 @@ sudo nginx -s reload # 重新加载配置
 * 二、利用文件sha256sum 结合 crontab 定时任务[](./restart-nginx1.sh)
 - 利用 crontab 24h 判断证书sha256sum值，发生变化时则触发重新加载 nginx 
 
-### 二 、nginx v2certbot 基于容器启动[docker-compose yml 使用方式启动](./docker-compose-v2certbot1.yml)
+### 二 、nginx v2certbot 基于容器启动[docker-compose yml ](./docker-compose-v2certbot1.yml)
 
 #### 1、服务说明
 
