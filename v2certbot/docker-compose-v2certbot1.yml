@@ -8,6 +8,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /opt/nginx/conf.d:/etc/nginx/conf.d
+      # default.conf
       - /opt/nginx/nginx.conf:/etc/nginx/nginx.conf
       - /opt/html:/usr/share/nginx/html
       - /opt/nginx/letsencrypt/live/yanxianhe.com/fullchain.pem:/etc/ssl/certs/server.crt
