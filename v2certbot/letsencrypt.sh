@@ -2,6 +2,8 @@
 set -x
 # 设置默认更新间隔为一天的秒数
 UPDATE_INTERVAL=${UPDATE_INTERVAL:-86400}
+HTTP_PORT=${HTTP_PORT:-80}
+HTTPS_PORT=${HTTPS_PORT:-443}
 while true; do
     # 检查必要的环境变量是否设置
     if [ -z "${LET_MAILBOX}" ] || [ -z "${DOMAIN_NAME}" ]; then
@@ -11,7 +13,8 @@ while true; do
     fi
     # 检查是否存在管理的证书，如果没有则执行首次证书申请操作
     if ! certbot certificates | grep -q "${DOMAIN_NAME}"; then
-        certbot certonly --webroot --webroot-path=/var/www/html --email "${LET_MAILBOX}" --agree-tos --no-eff-email --force-renewal -d "${DOMAIN_NAME}"
+        # certbot certonly --webroot --webroot-path=/var/www/html --email "${LET_MAILBOX}" --agree-tos --no-eff-email --force-renewal -d "${DOMAIN_NAME}"
+        certbot certonly --webroot --webroot-path=/var/www/html --http-01-port="${HTTP_PORT}" --https-01-port="${HTTPS_PORT}" --email "${LET_MAILBOX}" --agree-tos --no-eff-email --force-renewal -d "${DOMAIN_NAME}"
         echo "Certbot certonly --webroot operation completed."
     else
         # 获取证书到期天数
