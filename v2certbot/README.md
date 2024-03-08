@@ -20,6 +20,11 @@
 - ./指当前目录 ./certs ./www/html
 
 - 环境变量
+    * 如果你的服务不是默认的 HTTP（80）和 HTTPS（443）端口，而是使用了其他端口 请设置 HTTP_PORT HTTPS_PORT 环境变量
+    * 默认http 端口 80 
+        HTTP_PORT=80
+    * 默认https 端口 443
+        HTTPS_PORT=443
     * 间隔多久更新一次证书默 24小时 86400s
         UPDATE_INTERVAL=86400 
     * 设置邮箱 必填 [注意**换成自己邮箱]
