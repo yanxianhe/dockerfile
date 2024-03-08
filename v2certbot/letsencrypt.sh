@@ -20,9 +20,11 @@ while true; do
         # 获取证书到期天数
         EXPIRY_DATE=$(certbot certificates | grep "Expiry Date" | awk '{print $6}')
         echo "Certificate for ${DOMAIN_NAME} will expire on: ${EXPIRY_DATE}"
-        # 判断证书有效期，大于10天不续订，否则续订
+        # 判断证书有效期，大于10天不续订，否则续订 
+        # certbot renew 命令用于自动续签由 Certbot 管理的证书，而不需要重新指定之前用于创建证书的所有参数，包括验证方法、端口和路径。
         if [ $EXPIRY_DATE -le 10 ]; then
-            certbot renew --webroot --webroot-path=/var/www/html
+            #certbot renew --webroot --webroot-path=/var/www/html
+            certbot renew --webroot --webroot-path=/var/www/html --http-01-port="${HTTP_PORT}" --https-01-port="${HTTPS_PORT}"
             echo "Certbot renew --webroot operation completed."
         else
             echo "Certificate is still valid for more than 10 days. No renewal needed."
