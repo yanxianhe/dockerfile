@@ -1,10 +1,6 @@
-
-
-* https://github.com/certbot/certbot 
-* 基于原有镜像certbot/certbot:v2.9.0 
+* https://github.com/certbot/certbot
+* 基于原有镜像certbot/certbot:v2.9.0
 * [由于 certbot 运行后容器就结束导致无法直接 续订证书](./Dockerfile)
-
-
 
 ## nginx 证书自动续签【certbot基于容器运行模式】
 
@@ -14,17 +10,16 @@
 * 生成证书后再配置 https 配置
 
 ### 一 、nginx 直接安装在宿主机（apt/yum/ 等方式） [docker-compose yml ](./docker-compose-v2certbot.yml)
+
 #### 1、v2certbot 服务说明
 
-~~~~~~
+```
 - ./指当前目录 ./certs ./www/html
 
 - 环境变量
-    * 如果你的服务不是默认的 HTTP（80）和 HTTPS（443）端口，而是使用了其他端口 请设置 HTTP_PORT HTTPS_PORT 环境变量
+    * 如果你的服务不是默认的 HTTP（80）请设置 HTTP_PORT  环境变量
     * 默认http 端口 80 
         HTTP_PORT=80
-    * 默认https 端口 443
-        HTTPS_PORT=443
     * 间隔多久更新一次证书默 24小时 86400s
         UPDATE_INTERVAL=86400 
     * 设置邮箱 必填 [注意**换成自己邮箱]
@@ -42,10 +37,13 @@
     docker-compose -p v2certbot -f ./docker-compose-v2certbot.yml up -d
 - 停止 v2certbot
     docker-compose -p v2certbot -f ./docker-compose-v2certbot.yml down
-~~~~~~
+```
+
 #### 2、v2certbot 服务验证
+
 - 查询管理证书信息[certbot certificates]
-~~~~~~
+
+```
 ~$ docker exec -it v2certbot certbot certificates
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 
@@ -60,37 +58,42 @@ Found the following certs:
     Private Key Path: /etc/letsencrypt/live/yanxianhe.com/privkey.pem
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-~~~~~~
+```
+
 #### 3、nginx 配置证书 ssl
 
 - nginx 证书位置需要配置启动v2certbot具体位置 ./certs/live/${DOMAIN_NAME}
 - fullchain.pem 对应 server.crt ; privkey.pem 对应 server.key
 - 放开 443 配置证书位置
-~~~~~~
+
+```
 …… 略
     listen       443 ssl;
     ssl_certificate ./certs/live/${DOMAIN_NAME}/fullchain.pem;
     ssl_certificate_key ./certs/live/${DOMAIN_NAME}/privkey.pem;
 …… 略
-~~~~~~
+```
 
 #### 4、验证nginx 配置重新加载配置
 
 - 验证配置没有问题后重新加载nginx配置
-~~~~~~
+
+```
 sudo nginx -t # 验证配置 
 sudo nginx -s reload # 重新加载配置
-~~~~~~
+```
 
 #### 5、续订证书后重新加载配置文件
 
 * 一、利用certbot certificates 结合 crontab 定时任务[](./restart-nginx.sh)
+
 - 续订后有效时间90天[共涵盖了 89 天和23小时] ，默认提前 10 天续订
-- 利用 certbot certificates 查询VALID: 来重新加载sudo nginx -s reload 
-- 利用 crontab 24h 判断VALID ,新的一轮证书有效大于等于 89 则触发重新加载 nginx 
+- 利用 certbot certificates 查询VALID: 来重新加载sudo nginx -s reload
+- 利用 crontab 24h 判断VALID ,新的一轮证书有效大于等于 89 则触发重新加载 nginx
 
 * 二、利用文件sha256sum 结合 crontab 定时任务[](./restart-nginx1.sh)
-- 利用 crontab 24h 判断证书sha256sum值，发生变化时则触发重新加载 nginx 
+
+- 利用 crontab 24h 判断证书sha256sum值，发生变化时则触发重新加载 nginx
 
 ### 二 、nginx v2certbot 基于容器启动[docker-compose yml ](./docker-compose-v2certbot1.yml)
 
@@ -98,7 +101,7 @@ sudo nginx -s reload # 重新加载配置
 
 - 使用绝对路径 /opt/
 
-~~~~~~
+```
 .
 ├── html                                        # web 根目录v2certbot 也需要 /opt/html 目录
 │   ├── ……
@@ -124,11 +127,13 @@ sudo nginx -s reload # 重新加载配置
     docker-compose -p nginx -f ./docker-compose-v2certbot1.yml up -d
 - 停止 nginx v2certbot
     docker-compose -p nginx -f ./docker-compose-v2certbot1.yml down
-~~~~~~
+```
 
 #### 2、v2certbot 服务验证
+
 - 查询管理证书信息[certbot certificates]
-~~~~~~
+
+```
 ~$ docker exec -it v2certbot certbot certificates
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 
@@ -143,45 +148,48 @@ Found the following certs:
     Private Key Path: /etc/letsencrypt/live/yanxianhe.com/privkey.pem
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-~~~~~~
+```
+
 #### 3、nginx 配置证书 ssl
 
 - nginx 证书位置需要配置启动v2certbot具体位置 ./certs/live/${DOMAIN_NAME}
 - fullchain.pem 对应 server.crt ; privkey.pem 对应 server.key
 - 放开 443 配置证书位置
-~~~~~~
+
+```
 …… 略
     listen       443 ssl;
     ssl_certificate /etc/ssl/certs/server.crt;
     ssl_certificate_key /etc/ssl/private/server.key;
 …… 略
-~~~~~~
-
+```
 
 #### 4、验证nginx 配置重新加载配置
 
 - 验证配置没有问题后重新加载nginx配置
-~~~~~~
+
+```
 docker exec -it nginx nginx -t # 验证配置 
 docker exec -it nginx nginx -s reload # 重新加载配置
-~~~~~~
+```
 
 #### 5、续订证书后重新加载配置文件
 
 * 一、利用certbot certificates 结合 crontab 定时任务[](./restart-nginx.sh)
+
 - 续订后有效时间90天[共涵盖了 89 天和23小时] ，默认提前 10 天续订
 - 利用 certbot certificates 查询VALID: 来重新加载[sudo nginx -s reload 换成  docker exec -it nginx nginx -s reload]
-- 利用 crontab 24h 判断VALID ,新的一轮证书有效大于等于 89 则触发重新加载 nginx 
+- 利用 crontab 24h 判断VALID ,新的一轮证书有效大于等于 89 则触发重新加载 nginx
 
 * 二、利用文件sha256sum 结合 crontab 定时任务[](./restart-nginx1.sh)
-- 利用 crontab 24h 判断证书sha256sum值，发生变化时则触发重新加载[ nginx  sudo nginx -s reload 换成  docker exec -it nginx nginx -s reload]
 
+- 利用 crontab 24h 判断证书sha256sum值，发生变化时则触发重新加载[ nginx  sudo nginx -s reload 换成  docker exec -it nginx nginx -s reload]
 
 ### 三、crontab 根据需要自行设置
 
 - 例：设置每日0点 检查校验 nginx 证书
 - chmod a+x /opt/restart-nginx.sh
 
-~~~~~~
+```
 0 0 * * * sh /opt/restart-nginx.sh
-~~~~~~
+```
